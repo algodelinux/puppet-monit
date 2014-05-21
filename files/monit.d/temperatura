@@ -1,0 +1,11 @@
+check program CPUtemp with path "/usr/local/sbin/cputemp.sh"
+   if status > 60 then alert
+   group temperature
+
+check program MBtemp with path "/usr/local/sbin/mbtemp.sh"
+   if status > 60 then alert
+   group temperature
+
+check program HDDtemp with path "/usr/local/sbin/hddtemp.sh"
+   if status > 40 then alert
+   group temperature

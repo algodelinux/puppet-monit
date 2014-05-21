@@ -1,0 +1,31 @@
+check process cups with pidfile /var/run/cups/cupsd.pid
+   group lpadmin
+   start program = "/usr/sbin/service cups start"
+   stop program  = "/usr/sbin/service cups stop"
+   if failed unixsocket /var/run/cups/cups.sock then restart
+   if failed port 631 protocol http with timeout 15 seconds for 3 cycles then restart
+   if 3 restarts within 5 cycles then timeout
+   depends on cupsd_bin
+   depends on cupsd_rc
+
+check file cupsd_bin with path /usr/sbin/cupsd
+   group lpadmin
+   if failed checksum then unmonitor
+   if failed permission 755 then unmonitor
+   if failed uid root then unmonitor
+   if failed gid root then unmonitor
+
+check file cupsd_rc with path /etc/init.d/cups
+   group lpadmin
+   if failed checksum then unmonitor
+   if failed permission 755 then unmonitor
+   if failed uid root then unmonitor
+   if failed gid root then unmonitor
+
+check directory cups_spool with path /var/spool/cups
+   group lpadmin
+   if failed permission 710  then unmonitor
+   if failed uid root        then unmonitor
+   if failed gid lp          then unmonitor
+
+

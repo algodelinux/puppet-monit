@@ -1,0 +1,6 @@
+check process autofs with pidfile /var/run/autofs-running
+        group system
+        start program = "/etc/init.d/autofs start"
+        stop program = "/etc/init.d/autofs stop"
+        if 5 restarts within 5 cycles then alert
+

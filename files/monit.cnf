@@ -1,0 +1,35 @@
+# create RSA certs - Server
+
+RANDFILE = ./openssl.rnd
+
+[ req ]
+default_bits = 1024
+encrypt_key = yes
+distinguished_name = req_dn
+x509_extensions = cert_type
+
+[ req_dn ]
+countryName = ES
+countryName_default = ES
+
+stateOrProvinceName             = CACERES
+stateOrProvinceName_default     = CACERES
+
+localityName                    = CACERES
+localityName_default            = CACERES
+
+organizationName                = GOBIERNO DE EXTREMADURA
+organizationName_default        = GOBIERNO DE EXTREMADURA
+
+organizationalUnitName          = IES VALLE DEL JERTE
+organizationalUnitName_default  = IES VALLE DEL JERTE
+
+commonName                      = iesvalledeljerte.juntaextremadura.net
+commonName_default              = iesvalledeljerte.juntaextremadura.net
+
+emailAddress                    = adminies.valledeljerte@edu.juntaextremadura.net
+emailAddress_default            = adminies.valledeljerte@edu.juntaextremadura.net
+
+[ cert_type ]
+nsCertType = server
+

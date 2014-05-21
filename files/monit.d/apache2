@@ -1,0 +1,17 @@
+check process apache2 with pidfile /var/run/apache2.pid
+   group system
+   start program = "/usr/sbin/service apache2 start" with timeout 60 seconds
+   stop program  = "/usr/sbin/service apache2 stop"
+   if cpu is greater than 60% for 2 cycles then alert
+   if cpu > 80% for 5 cycles then restart
+   if totalmem > 200.0 MB for 5 cycles then restart
+   if children > 250 then restart
+   if loadavg(5min) greater than 10 for 8 cycles then stop
+   depends on apache2_rc
+
+check file apache2_rc with path /etc/init.d/apache2
+   group system
+   if failed checksum then unmonitor
+   if failed permission 755 then unmonitor
+   if failed uid root then unmonitor
+   if failed gid root then unmonitor

@@ -1,0 +1,96 @@
+###############################################################################
+## Monit control file
+###############################################################################
+##
+## Comments begin with a '#' and extend through the end of the line. Keywords
+## are case insensitive. All path's MUST BE FULLY QUALIFIED, starting with '/'.
+##
+## Below you will find examples of some frequently used statements. For 
+## information about the control file, a complete list of statements and 
+## options please have a look in the monit manual.
+##
+##
+###############################################################################
+## Global section
+###############################################################################
+set daemon  60
+
+set logfile syslog facility log_daemon                       
+
+# set mailserver mail.bar.baz,               # primary mailserver
+#                backup.bar.baz port 10025,  # backup mailserver on port 10025
+#                localhost                   # fallback relay
+
+set mailserver smtp.gmail.com port 587
+    username "usuario@gmail.com" password "mipassword"
+    using tlsv1
+    with timeout 30 seconds
+
+# De quien proviene la alerta
+set mail-format { from: emisor@gmail.com }
+
+# A quien se envía la alerta
+set alert receptor@gmail.com
+
+# You can define your mail-notification format. Do man monit 
+mail-format {
+    from: emisor@gmail.com
+    subject: HOST $HOST $SERVICE $EVENT at $DATE
+    message: Monit $ACTION $SERVICE at $DATE on $HOST,
+
+    Yours sincerely,
+    Esteban M. Navas Martín.
+    }
+
+set eventqueue
+     basedir /var/monit  # set the base directory where events will be stored
+     slots 100           # optionaly limit the queue size
+
+set httpd port 2812
+    allow localhost        # allow localhost to connect to the server and
+    allow 192.168.1.14     # allow localhost to connect to the server and
+#    allow admdor1  	   # allow admdor1 to connect to the server and
+#    allow admdor2  	   # allow admdor1 to connect to the server and
+    allow admin:password   # require user 'admin' with password 'password'
+
+###############################################################################
+## Services
+###############################################################################
+
+check process inetd with pidfile /var/run/inetd.pid
+	group system
+	start program = "/etc/init.d/openbsd-inetd start"
+	stop  program = "/etc/init.d/openbsd-inetd stop"
+        if failed port 69 type udp then restart
+        if failed port 2000 type tcp then restart
+	if 5 restarts within 5 cycles then timeout
+
+check process ntpd with pidfile /var/run/ntpd.pid
+	group system
+	start program = "/etc/init.d/ntp start"
+	stop  program = "/etc/init.d/ntp stop"
+	if failed host localhost port 123 type udp then alert
+	if 5 restarts within 5 cycles then alert
+
+check process rsyslogd with pidfile /var/run/rsyslogd.pid
+	group system
+	start program = "/etc/init.d/rsyslog start"
+	stop program = "/etc/init.d/rsyslog stop"
+	if 5 restarts within 5 cycles then timeout
+
+check file syslogd_file with path /var/log/syslog
+	if timestamp > 65 minutes then alert # Have you seen "-- MARK --"?
+
+
+###############################################################################
+## Includes
+###############################################################################
+##
+## It is possible to include additional configuration parts from other files or
+## directories.
+#
+#  include /etc/monit.d/*
+#  
+#    
+include /etc/monit.d/*
+
